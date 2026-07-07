@@ -90,6 +90,22 @@ h1 {
   font-size: 16px;
 }
 
+.version-link {
+  margin: 16px 0 0;
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+.version-link a {
+  color: var(--blue);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.version-link a:hover {
+  text-decoration: underline;
+}
+
 .layout {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);

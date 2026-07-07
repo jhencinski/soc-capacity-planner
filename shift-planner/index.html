@@ -4,8 +4,8 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content="A free tool for SOC leaders to model analyst capacity vs. workload utilization on a month-to-month basis." />
-    <title>SOC Capacity Planner</title>
-    <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+    <title>SOC Capacity Planner — Shift Planner</title>
+    <link rel="icon" type="image/svg+xml" href="../favicon.svg" />
     <!-- Cloudflare Web Analytics -->
     <script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "783f99b38560410d897b9d3c08eedf8d"}'></script>
     <!-- End Cloudflare Web Analytics -->
@@ -14,58 +14,34 @@
     <div class="page">
       <header class="page-header">
         <p class="eyebrow">Free tool &middot; no signup</p>
-        <h1>SOC Capacity Planner</h1>
+        <h1>SOC Capacity Planner &mdash; Shift Planner</h1>
         <p class="subtitle">
-          Model your SOC's monthly capacity against its workload to see where
-          utilization stands &mdash; before it shows up as backlog or burnout.
+          Model capacity across day, night, and weekend shifts, split
+          workload between them, and save scenarios to compare staffing
+          options side by side.
         </p>
         <p class="version-link">
-          Staffed across day / night / weekend shifts?
-          <a href="shift-planner/">Try the Shift Planner &rarr;</a>
+          <a href="../">&larr; Back to the simple calculator</a>
         </p>
       </header>
 
       <main class="layout">
         <section class="inputs-column" aria-label="Inputs">
           <div class="card">
-            <h2>Your team</h2>
+            <h2>Your shifts</h2>
             <p class="card-hint">
-              How many working hours does your team actually have this month?
+              Break your coverage into shifts (day / night / weekend, or
+              however your SOC is staffed) to see whether workload is
+              distributed the same way your staffing is.
             </p>
 
-            <div class="field">
-              <label for="analysts">Number of analysts</label>
-              <input type="number" id="analysts" min="0" step="1" value="4" />
-            </div>
+            <div id="shiftsContainer"></div>
 
-            <div class="field">
-              <label for="hoursPerDay">Hours per shift/day</label>
-              <input type="number" id="hoursPerDay" min="0" step="0.5" value="8" />
-            </div>
+            <button type="button" id="addShiftBtn" class="add-shift-btn">
+              + Add shift
+            </button>
 
-            <div class="field">
-              <label for="daysPerMonth">Working days per month</label>
-              <input type="number" id="daysPerMonth" min="0" step="1" value="22" />
-            </div>
-
-            <div class="field">
-              <label for="productivity">
-                Productivity factor
-                <span class="field-suffix" id="productivityValue">70%</span>
-              </label>
-              <input
-                type="range"
-                id="productivity"
-                min="30"
-                max="100"
-                step="5"
-                value="70"
-              />
-              <p class="field-help">
-                The share of a shift spent on actual task work, after
-                meetings, breaks, training, and admin overhead.
-              </p>
-            </div>
+            <p class="card-footnote" id="shareTotalHint"></p>
           </div>
 
           <div class="card">
@@ -148,12 +124,56 @@
             </div>
           </div>
 
+          <div class="card">
+            <h2>Shift breakdown</h2>
+            <p class="card-hint">
+              Utilization per shift &mdash; a shift can be overloaded even
+              when the overall number looks healthy.
+            </p>
+            <div class="table-wrap">
+              <table class="data-table" id="shiftTable">
+                <thead>
+                  <tr>
+                    <th>Shift</th>
+                    <th>Capacity</th>
+                    <th>Workload</th>
+                    <th>Utilization</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody id="shiftTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="card">
+            <h2>Scenarios</h2>
+            <p class="card-hint">
+              Save the current inputs as a named scenario to compare options
+              side by side &mdash; saved only in this browser.
+            </p>
+            <div class="scenario-save-row">
+              <input
+                type="text"
+                id="scenarioName"
+                placeholder="e.g. Add 2 analysts to night shift"
+              />
+              <button type="button" id="saveScenarioBtn">Save scenario</button>
+            </div>
+            <div id="scenarioList"></div>
+            <p class="card-footnote" id="scenarioEmptyHint">
+              No scenarios saved yet.
+            </p>
+          </div>
+
           <details class="card methodology">
             <summary>How this is calculated</summary>
             <div class="methodology-body">
               <p>
-                <strong>Monthly capacity</strong> = analysts &times; hours/day
+                <strong>Shift capacity</strong> = analysts &times; hours/day
                 &times; working days/month &times; productivity factor.
+                <strong>Monthly capacity</strong> is the sum across all
+                shifts.
               </p>
               <p>
                 <strong>Monthly workload</strong> = the sum of (volume
@@ -161,8 +181,10 @@
                 investigations, and incident response, converted to hours.
               </p>
               <p>
-                <strong>Utilization</strong> = monthly workload &divide;
-                monthly capacity.
+                <strong>Shift workload</strong> = monthly workload &times;
+                that shift's workload share. <strong>Utilization</strong> =
+                workload &divide; capacity, computed both overall and per
+                shift.
               </p>
               <p class="methodology-credit">
                 Model adapted from Capacity Builders'
@@ -188,6 +210,6 @@
         </p>
       </footer>
     </div>
-    <script type="module" src="/src/simple/main.ts"></script>
+    <script type="module" src="/src/shift-planner/main.ts"></script>
   </body>
 </html>
