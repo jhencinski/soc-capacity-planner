@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Simulate SOC backlog and queue wait times under real-world variability and volume spikes, free and in your browser." />
+    <title>SOC Capacity Planner — Backlog Simulator</title>
+    <link rel="icon" type="image/svg+xml" href="../favicon.svg" />
+    <!-- Cloudflare Web Analytics -->
+    <script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "783f99b38560410d897b9d3c08eedf8d"}'></script>
+    <!-- End Cloudflare Web Analytics -->
+  </head>
+  <body>
+    <div class="page">
+      <header class="page-header">
+        <p class="eyebrow">Free tool &middot; no signup</p>
+        <h1>SOC Capacity Planner &mdash; Backlog Simulator</h1>
+        <p class="subtitle">
+          A static monthly average can look healthy while a real queue still
+          backs up. This runs a discrete-event simulation with random
+          arrivals and handle times &mdash; and an optional volume spike
+          &mdash; to show what a month can actually look like.
+        </p>
+        <p class="version-link">
+          <a href="../">Simple calculator</a> &middot;
+          <a href="../shift-planner/">Shift Planner</a>
+        </p>
+      </header>
+
+      <main class="layout">
+        <section class="inputs-column" aria-label="Inputs">
+          <div class="card">
+            <h2>Your team</h2>
+            <p class="card-hint">
+              A single pool of analysts, continuously available at their
+              average rate (no day/night shift clock in this model).
+            </p>
+
+            <div class="field">
+              <label for="analysts">Number of analysts</label>
+              <input type="number" id="analysts" min="1" step="1" value="4" />
+            </div>
+
+            <div class="field">
+              <label for="hoursPerDay">Hours per shift/day</label>
+              <input type="number" id="hoursPerDay" min="0" step="0.5" value="8" />
+            </div>
+
+            <div class="field">
+              <label for="daysPerMonth">Working days per month</label>
+              <input type="number" id="daysPerMonth" min="0" step="1" value="22" />
+            </div>
+
+            <div class="field">
+              <label for="productivity">
+                Productivity factor
+                <span class="field-suffix" id="productivityValue">70%</span>
+              </label>
+              <input
+                type="range"
+                id="productivity"
+                min="30"
+                max="100"
+                step="5"
+                value="70"
+              />
+            </div>
+          </div>
+
+          <div class="card">
+            <h2>Your monthly workload</h2>
+            <p class="card-hint">
+              Average volume and handle time &mdash; the simulation adds
+              realistic randomness around these averages.
+            </p>
+
+            <div class="workload-row workload-header" aria-hidden="true">
+              <span></span>
+              <span>Volume / month</span>
+              <span>Avg. minutes each</span>
+            </div>
+
+            <div class="workload-row">
+              <label for="triage-volume">Alerts triaged</label>
+              <input type="number" id="triage-volume" min="0" step="1" value="400" />
+              <input type="number" id="triage-minutes" min="0" step="1" value="15" />
+            </div>
+
+            <div class="workload-row">
+              <label for="investigation-volume">Investigations</label>
+              <input type="number" id="investigation-volume" min="0" step="1" value="80" />
+              <input type="number" id="investigation-minutes" min="0" step="1" value="60" />
+            </div>
+
+            <div class="workload-row">
+              <label for="incident-volume">Confirmed incidents</label>
+              <input type="number" id="incident-volume" min="0" step="1" value="12" />
+              <input type="number" id="incident-minutes" min="0" step="1" value="180" />
+            </div>
+          </div>
+
+          <div class="card">
+            <h2>Volume spike</h2>
+            <p class="card-hint">
+              Model a temporary surge to see how the backlog builds and
+              drains.
+            </p>
+            <label class="spike-toggle">
+              <input type="checkbox" id="spikeEnabled" />
+              Simulate a volume spike
+            </label>
+            <div class="spike-fields">
+              <div class="field-compact">
+                <label>Increase %</label>
+                <input type="number" id="spikePercent" min="0" step="10" value="100" />
+              </div>
+              <div class="field-compact">
+                <label>Start day</label>
+                <input type="number" id="spikeStartDay" min="1" max="30" step="1" value="10" />
+              </div>
+              <div class="field-compact">
+                <label>End day</label>
+                <input type="number" id="spikeEndDay" min="1" max="30" step="1" value="15" />
+              </div>
+            </div>
+          </div>
+
+          <button type="button" id="rerunBtn" class="rerun-btn">
+            ↻ Re-run simulation
+          </button>
+        </section>
+
+        <section class="results-column" aria-label="Results">
+          <div class="card results-card">
+            <h2>Simulated backlog over the month</h2>
+            <div id="chartContainer"></div>
+
+            <div class="stat-row">
+              <div class="stat-tile">
+                <span class="stat-label">Average wait</span>
+                <span class="stat-value" id="avgWaitValue">&mdash;</span>
+                <span class="stat-unit">minutes</span>
+              </div>
+              <div class="stat-tile">
+                <span class="stat-label">P95 wait</span>
+                <span class="stat-value" id="p95WaitValue">&mdash;</span>
+                <span class="stat-unit">minutes</span>
+              </div>
+              <div class="stat-tile stat-tile-emphasis">
+                <span class="stat-label">Peak backlog</span>
+                <span class="stat-value" id="peakBacklogValue">&mdash;</span>
+                <span class="stat-unit">waiting at once</span>
+              </div>
+            </div>
+
+            <p class="callout" id="calloutText"></p>
+            <p class="truncated-note" id="truncatedNote" style="display: none">
+              The queue was still growing at the end of the simulated window
+              — this scenario doesn't stabilize within a month.
+            </p>
+          </div>
+
+          <details class="card methodology">
+            <summary>How this is simulated</summary>
+            <div class="methodology-body">
+              <p>
+                Each analyst is a server pulling from one shared queue.
+                Alerts, investigations, and incidents arrive as random
+                (Poisson) events at your average monthly rate; each one's
+                handle time is drawn around your average, not fixed &mdash;
+                real workloads are bursty, not smooth.
+              </p>
+              <p>
+                Analysts aren't modeled on a real shift clock here. Instead,
+                your hours/day, days/month, and productivity factor are
+                folded into how much of the time each analyst is
+                effectively available, spread continuously across the
+                month &mdash; the same total capacity as the other two
+                calculators, just distributed differently for this model.
+              </p>
+              <p>
+                This is one random realization of the month, not an
+                average across many &mdash; click
+                <strong>Re-run simulation</strong> to see a different
+                possible outcome with the same inputs. That variability is
+                the point: it's why a queue can back up even when your
+                average utilization looks healthy.
+              </p>
+            </div>
+          </details>
+        </section>
+      </main>
+
+      <footer class="page-footer">
+        <p>
+          Built for SOC leaders as a free planning aid. Nothing you enter
+          leaves your browser.
+        </p>
+      </footer>
+    </div>
+    <script type="module" src="/src/simulator/main.ts"></script>
+  </body>
+</html>

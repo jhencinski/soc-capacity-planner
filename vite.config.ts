@@ -10,6 +10,7 @@ export default defineConfig({
       input: {
         main: root + "index.html",
         shiftPlanner: root + "shift-planner/index.html",
+        simulator: root + "simulator/index.html",
       },
     },
   },

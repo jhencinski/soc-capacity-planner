@@ -5,6 +5,7 @@
   --text-secondary: #52514e;
   --text-muted: #898781;
   --gridline: #e1e0d9;
+  --baseline: #c3c2b7;
   --border: rgba(11, 11, 11, 0.1);
 
   --blue: #2a78d6;
@@ -28,6 +29,7 @@
     --text-secondary: #c3c2b7;
     --text-muted: #898781;
     --gridline: #2c2c2a;
+    --baseline: #383835;
     --border: rgba(255, 255, 255, 0.1);
 
     --blue: #3987e5;
@@ -584,4 +586,86 @@ input[type="range"] {
   color: var(--text-muted);
   font-size: 13px;
   text-align: center;
+}
+
+.chart-wrap {
+  position: relative;
+}
+
+.backlog-chart {
+  width: 100%;
+  height: auto;
+  display: block;
+  cursor: crosshair;
+}
+
+.chart-tooltip {
+  position: absolute;
+  transform: translateX(-50%);
+  background: var(--text-primary);
+  color: var(--page-plane);
+  font-size: 12px;
+  font-weight: 600;
+  padding: 4px 8px;
+  border-radius: 6px;
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+.spike-fields {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 12px;
+}
+
+@media (max-width: 520px) {
+  .spike-fields {
+    grid-template-columns: 1fr;
+  }
+}
+
+.spike-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  margin-top: 4px;
+}
+
+.spike-toggle input {
+  width: 16px;
+  height: 16px;
+}
+
+.rerun-btn {
+  padding: 9px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: var(--radius-control);
+  border: 1px solid var(--border);
+  background: var(--surface-1);
+  color: var(--text-primary);
+  cursor: pointer;
+}
+
+.rerun-btn:hover {
+  background: var(--page-plane);
+}
+
+.callout {
+  padding: 16px;
+  border-radius: var(--radius-control);
+  background: var(--blue-100);
+  border: 1px solid var(--border);
+  font-size: 14px;
+  color: var(--text-primary);
+  margin-top: 16px;
+}
+
+.truncated-note {
+  color: var(--status-serious);
+  font-size: 13px;
+  margin-top: 8px;
 }
