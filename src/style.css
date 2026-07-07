@@ -205,6 +205,222 @@ input[type="range"] {
   font-weight: 500;
 }
 
+.shift-card {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-control);
+  padding: 14px 16px;
+  margin-bottom: 12px;
+  background: var(--page-plane);
+}
+
+.shift-card-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.shift-label-input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-primary);
+  padding: 4px 6px;
+  border-radius: 6px;
+}
+
+.shift-label-input:focus {
+  outline: 2px solid var(--blue);
+  background: var(--surface-1);
+}
+
+.remove-shift-btn {
+  flex: none;
+  width: 24px;
+  height: 24px;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.remove-shift-btn:hover {
+  background: var(--gridline);
+  color: var(--text-primary);
+}
+
+.shift-fields {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 10px;
+}
+
+@media (max-width: 640px) {
+  .shift-fields {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.field-compact label {
+  display: block;
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-bottom: 4px;
+}
+
+.field-compact input {
+  width: 100%;
+  padding: 8px 10px;
+  font-size: 14px;
+  border: 1px solid var(--gridline);
+  border-radius: var(--radius-control);
+  background: var(--surface-1);
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.add-shift-btn {
+  width: 100%;
+  padding: 10px;
+  border: 1px dashed var(--gridline);
+  border-radius: var(--radius-control);
+  background: transparent;
+  color: var(--blue);
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.add-shift-btn:hover {
+  background: var(--page-plane);
+}
+
+.hint-warning {
+  color: var(--status-serious) !important;
+}
+
+.table-wrap {
+  overflow-x: auto;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.data-table th {
+  text-align: left;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+  padding: 8px;
+  border-bottom: 1px solid var(--gridline);
+  white-space: nowrap;
+}
+
+.data-table td {
+  padding: 10px 8px;
+  border-bottom: 1px solid var(--gridline);
+  color: var(--text-primary);
+  white-space: nowrap;
+}
+
+.data-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.status-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.status-chip-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex: none;
+}
+
+.scenario-save-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.scenario-save-row input {
+  flex: 1;
+  padding: 10px 12px;
+  font-size: 14px;
+  border: 1px solid var(--gridline);
+  border-radius: var(--radius-control);
+  background: var(--page-plane);
+  color: var(--text-primary);
+}
+
+.scenario-save-row button,
+.scenario-actions button {
+  padding: 9px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: var(--radius-control);
+  border: 1px solid var(--border);
+  background: var(--blue);
+  color: #ffffff;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.scenario-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--gridline);
+}
+
+.scenario-row:last-child {
+  border-bottom: none;
+}
+
+.scenario-row-name {
+  margin: 0 0 4px;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.scenario-row-meta {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.scenario-actions {
+  display: flex;
+  gap: 6px;
+  flex: none;
+}
+
+.scenario-actions .delete-scenario-btn {
+  background: transparent;
+  color: var(--status-critical);
+  border-color: var(--border);
+}
+
 .stat-row {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));

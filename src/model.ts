@@ -1,8 +1,11 @@
-export interface TeamInputs {
+export interface ShiftInput {
+  id: string;
+  label: string;
   analysts: number;
   hoursPerDay: number;
   daysPerMonth: number;
   productivityPct: number;
+  workloadSharePct: number;
 }
 
 export interface WorkloadItem {
@@ -20,20 +23,34 @@ export interface StatusInfo {
   description: string;
 }
 
+export interface ShiftResult {
+  shift: ShiftInput;
+  capacityHours: number;
+  workloadHours: number;
+  utilizationPct: number;
+  status: StatusInfo;
+}
+
 export interface CapacityResult {
   capacityHours: number;
   loadingHours: number;
   utilizationPct: number;
   status: StatusInfo;
+  shiftResults: ShiftResult[];
+  workloadShareTotalPct: number;
 }
 
-export function monthlyCapacityHours(team: TeamInputs): number {
+export function shiftCapacityHours(shift: ShiftInput): number {
   return (
-    team.analysts *
-    team.hoursPerDay *
-    team.daysPerMonth *
-    (team.productivityPct / 100)
+    shift.analysts *
+    shift.hoursPerDay *
+    shift.daysPerMonth *
+    (shift.productivityPct / 100)
   );
+}
+
+export function totalCapacityHours(shifts: ShiftInput[]): number {
+  return shifts.reduce((sum, shift) => sum + shiftCapacityHours(shift), 0);
 }
 
 export function monthlyLoadingHours(items: WorkloadItem[]): number {
@@ -86,17 +103,83 @@ export function classifyUtilization(utilizationPct: number): StatusInfo {
 }
 
 export function computeCapacity(
-  team: TeamInputs,
+  shifts: ShiftInput[],
   items: WorkloadItem[],
 ): CapacityResult {
-  const capacityHours = monthlyCapacityHours(team);
+  const capacityHours = totalCapacityHours(shifts);
   const loadingHours = monthlyLoadingHours(items);
   const utilizationPct =
     capacityHours > 0 ? (loadingHours / capacityHours) * 100 : 0;
+
+  const shiftResults: ShiftResult[] = shifts.map((shift) => {
+    const shiftCapacity = shiftCapacityHours(shift);
+    const shiftWorkload = loadingHours * (shift.workloadSharePct / 100);
+    const shiftUtilizationPct =
+      shiftCapacity > 0 ? (shiftWorkload / shiftCapacity) * 100 : 0;
+    return {
+      shift,
+      capacityHours: shiftCapacity,
+      workloadHours: shiftWorkload,
+      utilizationPct: shiftUtilizationPct,
+      status: classifyUtilization(shiftUtilizationPct),
+    };
+  });
+
+  const workloadShareTotalPct = shifts.reduce(
+    (sum, shift) => sum + shift.workloadSharePct,
+    0,
+  );
+
   return {
     capacityHours,
     loadingHours,
     utilizationPct,
     status: classifyUtilization(utilizationPct),
+    shiftResults,
+    workloadShareTotalPct,
   };
+}
+
+export function createShift(overrides: Partial<ShiftInput> = {}): ShiftInput {
+  return {
+    id: crypto.randomUUID(),
+    label: "New shift",
+    analysts: 1,
+    hoursPerDay: 8,
+    daysPerMonth: 22,
+    productivityPct: 70,
+    workloadSharePct: 0,
+    ...overrides,
+  };
+}
+
+export function defaultShifts(): ShiftInput[] {
+  return [
+    createShift({
+      label: "All hours",
+      analysts: 4,
+      hoursPerDay: 8,
+      daysPerMonth: 22,
+      productivityPct: 70,
+      workloadSharePct: 100,
+    }),
+  ];
+}
+
+export function defaultWorkloadItems(): WorkloadItem[] {
+  return [
+    { key: "triage", label: "Alerts triaged", volumePerMonth: 400, minutesEach: 15 },
+    {
+      key: "investigation",
+      label: "Investigations",
+      volumePerMonth: 80,
+      minutesEach: 60,
+    },
+    {
+      key: "incident",
+      label: "Confirmed incidents",
+      volumePerMonth: 12,
+      minutesEach: 180,
+    },
+  ];
 }
