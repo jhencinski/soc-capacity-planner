@@ -69,6 +69,26 @@
             <div id="gapSummary"></div>
           </div>
 
+          <div class="card">
+            <h2>Saved plans</h2>
+            <p class="card-hint">
+              Save the current crews as a named plan to compare options
+              later &mdash; saved only in this browser.
+            </p>
+            <div class="scenario-save-row">
+              <input
+                type="text"
+                id="planName"
+                placeholder="e.g. 3-region follow-the-sun"
+              />
+              <button type="button" id="savePlanBtn">Save plan</button>
+            </div>
+            <div id="planList"></div>
+            <p class="card-footnote" id="planEmptyHint">
+              No plans saved yet.
+            </p>
+          </div>
+
           <details class="card methodology">
             <summary>How this is modeled</summary>
             <div class="methodology-body">

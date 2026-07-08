@@ -316,18 +316,22 @@ input[type="range"] {
 
 .shift-label-input {
   flex: 1;
-  border: none;
-  background: transparent;
+  border: 1px solid var(--gridline);
+  background: var(--surface-1);
   font-size: 15px;
   font-weight: 600;
   color: var(--text-primary);
-  padding: 4px 6px;
+  padding: 6px 8px;
   border-radius: 6px;
+}
+
+.shift-label-input:hover {
+  border-color: var(--baseline);
 }
 
 .shift-label-input:focus {
   outline: 2px solid var(--blue);
-  background: var(--surface-1);
+  border-color: transparent;
 }
 
 .remove-shift-btn {
@@ -369,7 +373,8 @@ input[type="range"] {
   margin-bottom: 4px;
 }
 
-.field-compact input {
+.field-compact input,
+.field-compact select {
   width: 100%;
   padding: 8px 10px;
   font-size: 14px;

@@ -11,6 +11,7 @@ import {
 } from "./model";
 import { computeCoverage, formatGapWindow } from "./coverage";
 import { renderCoverageHeatmap } from "./heatmap";
+import { deletePlan, loadPlans, savePlan, type CoveragePlan } from "./plans";
 
 function byId<T extends HTMLElement>(id: string): T {
   const el = document.getElementById(id);
@@ -57,6 +58,11 @@ const coveragePctValueEl = byId<HTMLSpanElement>("coveragePctValue");
 const gapHoursValueEl = byId<HTMLSpanElement>("gapHoursValue");
 const minStaffedValueEl = byId<HTMLSpanElement>("minStaffedValue");
 const gapSummaryEl = byId<HTMLDivElement>("gapSummary");
+
+const planNameInput = byId<HTMLInputElement>("planName");
+const savePlanBtn = byId<HTMLButtonElement>("savePlanBtn");
+const planList = byId<HTMLDivElement>("planList");
+const planEmptyHint = byId<HTMLParagraphElement>("planEmptyHint");
 
 function customFieldsHTML(block: ShiftBlock): string {
   return `
@@ -256,5 +262,63 @@ function renderResults(): void {
   }
 }
 
+function planRowHTML(plan: CoveragePlan): string {
+  const result = computeCoverage(plan.blocks);
+  const coveragePct = numberFormatter.format(100 - result.pctGap);
+  const statusGood = result.zeroCoverageSlots === 0;
+  const chipColor = statusGood ? "var(--status-good)" : "var(--status-critical)";
+  const statusLabel = statusGood ? "Full 24/7 coverage" : `${result.gaps.length} gap window${result.gaps.length === 1 ? "" : "s"}`;
+  return `
+    <div class="scenario-row" data-plan-id="${plan.id}">
+      <div class="scenario-row-info">
+        <p class="scenario-row-name">${escapeHtml(plan.name)}</p>
+        <p class="scenario-row-meta">
+          ${plan.blocks.length} crew${plan.blocks.length === 1 ? "" : "s"} &middot;
+          ${coveragePct}% coverage &middot;
+          <span class="status-chip"><span class="status-chip-dot" style="background:${chipColor}"></span>${statusLabel}</span>
+        </p>
+      </div>
+      <div class="scenario-actions">
+        <button type="button" class="load-plan-btn" data-plan-id="${plan.id}">Load</button>
+        <button type="button" class="delete-plan-btn" data-plan-id="${plan.id}">Delete</button>
+      </div>
+    </div>
+  `;
+}
+
+function renderPlanList(): void {
+  const plans = loadPlans();
+  planList.innerHTML = plans.map(planRowHTML).join("");
+  planEmptyHint.style.display = plans.length === 0 ? "block" : "none";
+}
+
+savePlanBtn.addEventListener("click", () => {
+  const name = planNameInput.value.trim() || `Plan (${new Date().toLocaleString()})`;
+  savePlan(name, blocks);
+  planNameInput.value = "";
+  renderPlanList();
+});
+
+planList.addEventListener("click", (e) => {
+  const target = e.target as HTMLElement;
+  const planId = target.dataset.planId;
+  if (!planId) return;
+
+  if (target.classList.contains("delete-plan-btn")) {
+    deletePlan(planId);
+    renderPlanList();
+    return;
+  }
+
+  if (target.classList.contains("load-plan-btn")) {
+    const plan = loadPlans().find((p) => p.id === planId);
+    if (!plan) return;
+    blocks = structuredClone(plan.blocks);
+    renderBlocks();
+    renderResults();
+  }
+});
+
 renderBlocks();
 renderResults();
+renderPlanList();
