@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Build a plan toward 24/7 SOC coverage across time zones and shift patterns like Panama and 4x10 — free and in your browser." />
+    <title>SOC Capacity Planner — 24/7 Coverage Planner</title>
+    <link rel="icon" type="image/svg+xml" href="../favicon.svg" />
+    <!-- Cloudflare Web Analytics -->
+    <script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "783f99b38560410d897b9d3c08eedf8d"}'></script>
+    <!-- End Cloudflare Web Analytics -->
+  </head>
+  <body>
+    <div class="page">
+      <header class="page-header">
+        <p class="eyebrow">Free tool &middot; no signup</p>
+        <h1>SOC Capacity Planner &mdash; 24/7 Coverage Planner</h1>
+        <p class="subtitle">
+          Stack shift crews across time zones and schedule patterns &mdash;
+          standard, 4&times;10, or Panama &mdash; and see exactly which
+          hours of the week are covered, and which aren't.
+        </p>
+        <p class="version-link">
+          <a href="../">Simple calculator</a> &middot;
+          <a href="../shift-planner/">Shift Planner</a> &middot;
+          <a href="../simulator/">Backlog Simulator</a>
+        </p>
+      </header>
+
+      <main class="layout">
+        <section class="inputs-column" aria-label="Inputs">
+          <div class="card">
+            <h2>Shift crews</h2>
+            <p class="card-hint">
+              Add one crew per shift block. Each crew's days/hours are in
+              its own local time &mdash; the coverage grid converts
+              everything to UTC.
+            </p>
+            <div id="blocksContainer"></div>
+            <button type="button" id="addBlockBtn" class="add-shift-btn">
+              + Add crew
+            </button>
+          </div>
+        </section>
+
+        <section class="results-column" aria-label="Results">
+          <div class="card results-card">
+            <h2>Weekly coverage (UTC)</h2>
+            <div id="heatmapContainer"></div>
+
+            <div class="stat-row">
+              <div class="stat-tile">
+                <span class="stat-label">Coverage</span>
+                <span class="stat-value" id="coveragePctValue">&mdash;</span>
+                <span class="stat-unit">of the week staffed</span>
+              </div>
+              <div class="stat-tile">
+                <span class="stat-label">Gap time</span>
+                <span class="stat-value" id="gapHoursValue">&mdash;</span>
+                <span class="stat-unit">hours/week uncovered</span>
+              </div>
+              <div class="stat-tile stat-tile-emphasis">
+                <span class="stat-label">Minimum staffed</span>
+                <span class="stat-value" id="minStaffedValue">&mdash;</span>
+                <span class="stat-unit">analysts, at the thinnest hour</span>
+              </div>
+            </div>
+
+            <div id="gapSummary"></div>
+          </div>
+
+          <details class="card methodology">
+            <summary>How this is modeled</summary>
+            <div class="methodology-body">
+              <p>
+                Each crew is converted from its local days/hours to UTC
+                using a fixed <strong>UTC offset</strong>, not a real
+                calendar timezone &mdash; so daylight saving time isn't
+                modeled. Nudge the offset by an hour when clocks change if
+                that matters for your plan.
+              </p>
+              <p>
+                <strong>Panama schedule</strong> crews are modeled as
+                steady-state coverage: every day of the week, a 12-hour
+                day or night window. That's the actual point of a 2-2-3
+                rotation &mdash; the number of analysts on duty stays
+                constant every day even though which specific people are
+                working rotates underneath it. Enter the headcount you have
+                <em>on duty during a shift</em>, not your total rotation
+                pool.
+              </p>
+              <p>
+                <strong>4&times;10 crews</strong> are a fixed weekly
+                pattern, not a rotation &mdash; a crew scheduled Sun&ndash;Wed
+                is genuinely off Thu&ndash;Sat every week. Pair a
+                Sun&ndash;Wed crew with a Wed&ndash;Sat crew to cover all 7
+                days.
+              </p>
+            </div>
+          </details>
+        </section>
+      </main>
+
+      <footer class="page-footer">
+        <p>
+          Built for SOC leaders as a free planning aid. Nothing you enter
+          leaves your browser.
+        </p>
+      </footer>
+    </div>
+    <script type="module" src="/src/coverage/main.ts"></script>
+  </body>
+</html>
